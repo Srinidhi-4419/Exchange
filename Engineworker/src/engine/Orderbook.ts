@@ -1,0 +1,80 @@
+import { Fills, Order } from "../types/Orderbook.types"
+export class Orderbook{
+    bids:Order[];
+    asks:Order[];
+    baseAsset:string;
+    quoteAsset:string="USDT";
+    lastTradeId:number;
+    currentPrice:number;
+
+    constructor(baseAsset:string,bids:Order[],asks:Order[],lastTradeId:number,currentPrice:number){
+        this.bids=bids;
+        this.asks=asks;
+        this.baseAsset=baseAsset;
+        this.lastTradeId=0;
+        this.currentPrice=0;
+    } 
+
+    ticker(){
+        return `${this.baseAsset}/${this.quoteAsset}`;
+    }
+    getSnapshot(){
+        return {
+            baseAsset: this.baseAsset,
+            bids: this.bids,
+            asks: this.asks,
+            lastTradeId: this.lastTradeId,
+            currentPrice: this.currentPrice
+        }
+    }
+    addOrder(order:Order){
+        if(order.side=="BUY"){
+            const result=this.matchBids(order);
+            if(!result) return;
+            const {executedqty,fills}=result;
+            order.filledQuantity=executedqty;
+            if(executedqty==order.quantity){
+                return {
+                    executedqty,
+                    fills
+                }
+            }
+            this.bids.push(order);
+            return {
+                executedqty,
+                fills
+            }
+                
+        }
+    }
+
+    matchBids(order:Order){
+        const fills:Fills[]=[];
+        let executedqty:number=0;
+        for(const ask of this.asks){
+            // example of limit order matching logic 2 quantity for 2000inr
+            if(order.kind=="LIMIT"){
+                if(order.price>=ask.price && executedqty<order.quantity){
+                    const filledqty=Math.min(order.quantity-executedqty,ask.quantity);
+                    executedqty+=filledqty;
+                    fills.push({
+                        price:ask.price,
+                        quantity:filledqty,
+                        tradeId:this.lastTradeId+1,
+                        marketOrderId:order.orderId,
+                        otheruserId:ask.userId
+                    })
+                    
+                }
+               for(let i=0;i<this.asks.length;i++){
+                if(this.asks[i].filledQuantity==this.asks[i].quantity){
+                    this.asks.splice(i,1);
+                    i--;
+               }
+               }
+               return {fills,executedqty};
+            }
+        }
+    }
+
+}
