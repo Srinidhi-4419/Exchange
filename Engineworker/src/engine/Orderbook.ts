@@ -11,8 +11,8 @@ export class Orderbook{
         this.bids=bids;
         this.asks=asks;
         this.baseAsset=baseAsset;
-        this.lastTradeId=0;
-        this.currentPrice=0;
+        this.lastTradeId=lastTradeId;
+        this.currentPrice=currentPrice;
     } 
 
     ticker(){
@@ -53,28 +53,34 @@ export class Orderbook{
         let executedqty:number=0;
         for(const ask of this.asks){
             // example of limit order matching logic 2 quantity for 2000inr
+            
+      if (order.kind === "LIMIT" && order.price < ask.price) break;
             if(order.kind=="LIMIT"){
                 if(order.price>=ask.price && executedqty<order.quantity){
-                    const filledqty=Math.min(order.quantity-executedqty,ask.quantity);
+                    const filledqty=Math.min(order.quantity-executedqty,ask.quantity-ask.filledQuantity);
+                    ask.filledQuantity+=filledqty;
                     executedqty+=filledqty;
                     fills.push({
                         price:ask.price,
                         quantity:filledqty,
                         tradeId:this.lastTradeId+1,
                         marketOrderId:order.orderId,
-                        otheruserId:ask.userId
+                        otheruserId:ask.userId,
                     })
                     
                 }
-               for(let i=0;i<this.asks.length;i++){
-                if(this.asks[i].filledQuantity==this.asks[i].quantity){
-                    this.asks.splice(i,1);
-                    i--;
-               }
-               }
+                for(let i=0;i<this.asks.length;i++){
+                    if(this.asks[i].filledQuantity==this.asks[i].quantity){
+                        this.asks.splice(i,1);
+                        i--;
+                }
+                }
                return {fills,executedqty};
             }
         }
+    }
+    mactchAsks(order:Order){
+        
     }
 
 }
