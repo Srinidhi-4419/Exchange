@@ -45,6 +45,22 @@ export class Orderbook{
                 fills
             }
                 
+        }else{
+            const result=this.mactchAsks(order);
+            if(!result) return;
+            const {executedqty,fills}=result;
+            order.filledQuantity=executedqty;
+            if(executedqty==order.quantity){
+                return {
+                    executedqty,
+                    fills
+                }
+            }
+            this.asks.push(order);
+            return {
+                executedqty,
+                fills
+            }
         }
     }
 
@@ -80,7 +96,29 @@ export class Orderbook{
         }
     }
     mactchAsks(order:Order){
-        
+        let fills:Fills[]=[];
+        let executedqty:number=0;
+        for(let i=0;i<this.bids.length;i++){
+            if(this.bids[i].price>=order.price && executedqty<order.quantity){
+                const remainingqty=Math.min(order.quantity-executedqty,this.bids[i].quantity-this.bids[i].filledQuantity);
+                this.bids[i].filledQuantity+=remainingqty;
+                executedqty+=remainingqty;
+                fills.push({
+                    price:this.bids[i].price,
+                    quantity:remainingqty,
+                    tradeId:this.lastTradeId+1,
+                    marketOrderId:order.orderId,
+                    otheruserId:this.bids[i].userId,
+                })
+                for(let i=0;i<this.bids.length;i++){
+                    if(this.bids[i].filledQuantity==this.bids[i].quantity){
+                        this.bids.splice(i,1);
+                        i--;
+                    }
+                }
+                return {fills,executedqty};
+            }
+        }
     }
 
 }
