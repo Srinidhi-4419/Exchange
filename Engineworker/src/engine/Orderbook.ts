@@ -68,7 +68,6 @@ export class Orderbook{
         const fills:Fills[]=[];
         let executedqty:number=0;
         for(const ask of this.asks){
-            // example of limit order matching logic 2 quantity for 2000inr
             
       if (order.kind === "LIMIT" && order.price < ask.price) break;
             if(order.kind=="LIMIT"){
