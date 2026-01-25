@@ -24,5 +24,8 @@ class RedisManager{
     public sendtoQueue(clientId:string,message:MessageToApi){
         this.client.rpush(clientId,JSON.stringify(message));
     }
+     public sendToApi(clientId: string, message: MessageToApi) {
+        this.client.publish(clientId, JSON.stringify(message));
+    }
 }
 export default RedisManager;

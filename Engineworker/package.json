@@ -12,5 +12,8 @@
   "dependencies": {
     "fs": "^0.0.1-security",
     "ioredis": "^5.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.10"
   }
 }
