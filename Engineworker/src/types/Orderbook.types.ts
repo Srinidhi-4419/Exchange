@@ -1,6 +1,6 @@
 
-type SIDE="BUY"|"SELL";
-type KIND="LIMIT"|"MARKET";
+export type SIDE="BUY"|"SELL";
+export type KIND="LIMIT"|"MARKET";
 export interface Order{
     price:number;
     quantity:number;
