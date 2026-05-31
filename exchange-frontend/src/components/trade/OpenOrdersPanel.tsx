@@ -39,7 +39,7 @@ export default function OpenOrdersPanel({ market }: { market: Market }) {
           <tbody>
             {openOrders.map((order) => (
               <tr key={order.orderId} className="border-b border-[var(--border)]">
-                <td className={`px-4 py-3 ${order.side === "BUY" ? "text-bid" : "text-ask"}`}>
+                <td className={`px-4 py-3 ${order.side.toUpperCase() === "BUY" ? "text-bid" : "text-ask"}`}>
                   {order.side}
                 </td>
                 <td className="px-4 py-3">{order.type}</td>

@@ -81,6 +81,7 @@ export class Orderbook {
     this.asks.sort((a, b) => a.price - b.price);
 
     for (const ask of this.asks) {
+      if (ask.userId === order.userId) continue;
       if (executedQty >= order.quantity) break;
       if (order.kind === "LIMIT" && Number(order.price) < Number(ask.price)) break;
 
@@ -118,6 +119,7 @@ export class Orderbook {
     this.bids.sort((a, b) => b.price - a.price);
 
     for (const bid of this.bids) {
+      if (bid.userId === order.userId) continue;
       if (executedQty >= order.quantity) break;
       if (order.kind === "LIMIT" && Number(bid.price) < Number(order.price)) break;
 
