@@ -7,6 +7,7 @@ This project is designed to demonstrate the high-level architecture of an exchan
 For a deeper walkthrough of the architecture, order flow, and implementation decisions, read the accompanying blog post:
 
 📖 [Building a Low-Latency Exchange — Architecture, Orderbook & Real-Time Trading Flow](https://medium.com/@kulkarnisrinidhi85/building-a-low-latency-exchange-architecture-orderbook-and-real-time-trading-flow-dc46398d4fc5)
+[Demo Video of Working](https://drive.google.com/file/d/1yLbnMhuhIDnkKFMwENYb_WEn0aq5WlIp/view?usp=sharing)
 
 ***
 
