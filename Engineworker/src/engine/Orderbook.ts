@@ -100,6 +100,7 @@ export class Orderbook {
         price: ask.price,
         quantity: fillQty,
         tradeId: this.lastTradeId,
+        //  i know name is ambiguous but this is the orderId of the order in market which got matched with incoming bid order
         marketOrderId: ask.orderId,
         otheruserId: ask.userId,
         marketRemainingQuantity: Math.max(0, ask.quantity - ask.filledQuantity),
@@ -107,6 +108,7 @@ export class Orderbook {
       });
     }
 
+    // remove fully filled asks
     this.asks = this.asks.filter((a) => a.filledQuantity < a.quantity);
 
     return { executedQty, fills };

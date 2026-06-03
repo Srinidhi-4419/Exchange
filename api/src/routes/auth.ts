@@ -1,7 +1,7 @@
 import { Router } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { client } from "../db";
+import { pool } from "../db";
 import RedisClient from "../configs/RedisClient";
 
 export const authroutes = Router();
@@ -17,7 +17,7 @@ authroutes.post("/signup", async (req, res) => {
             });
         }
 
-        const existingUser = await client.query(
+        const existingUser = await pool.query(
             `
             SELECT * FROM users
             WHERE email = $1
@@ -33,7 +33,7 @@ authroutes.post("/signup", async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const result = await client.query(
+        const result = await pool.query(
             `
             INSERT INTO users (
                 email,
@@ -47,7 +47,7 @@ authroutes.post("/signup", async (req, res) => {
 
         const userId = result.rows[0].id;
 
-        await client.query(
+        await pool.query(
             `
             INSERT INTO balances (
                 user_id,
@@ -65,6 +65,7 @@ authroutes.post("/signup", async (req, res) => {
         );
 
         // notify engine
+        // Handles the scenaio where worker is already running and user signs up
         redis.sendMessage({
             type: "USER_CREATED",
             data: {
@@ -120,7 +121,7 @@ authroutes.post("/signin", async (req, res) => {
             });
         }
 
-        const result = await client.query(
+        const result = await pool.query(
             `
             SELECT * FROM users
             WHERE email = $1

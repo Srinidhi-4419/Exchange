@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { client } from "../db";
+import {  pool } from "../db";
 
 const tickerrouter = Router();
 
@@ -16,7 +16,7 @@ tickerrouter.get("/", async (req, res) => {
 
         // last price
 
-        const lastPriceResult = await client.query(
+        const lastPriceResult = await pool.query(
             `
             SELECT price
             FROM trades
@@ -29,7 +29,7 @@ tickerrouter.get("/", async (req, res) => {
 
         // 24h stats
 
-        const statsResult = await client.query(
+        const statsResult = await pool.query(
             `
             SELECT
                 MAX(price) AS high,
@@ -44,7 +44,7 @@ tickerrouter.get("/", async (req, res) => {
 
         // price 24h ago
 
-        const oldPriceResult = await client.query(
+        const oldPriceResult = await pool.query(
             `
             SELECT price
             FROM trades

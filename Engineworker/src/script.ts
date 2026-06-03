@@ -63,7 +63,7 @@ function makeClient(token: string): AxiosInstance {
   return axios.create({
     baseURL: BASE_URL,
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    timeout: 50000,
+    timeout: 150000,
   });
 }
 

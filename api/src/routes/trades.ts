@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { client } from "../db";
+import { pool } from "../db";
 import { authMiddleware } from "../middleware/middleware";
 
 export const tradesRouter = Router();
@@ -15,7 +15,7 @@ tradesRouter.get("/", async (req, res) => {
             });
         }
 
-        const result = await client.query(
+        const result = await pool.query(
             `
             SELECT 
                 id,
@@ -52,7 +52,7 @@ tradesRouter.get("/", async (req, res) => {
 tradesRouter.get("/my-trades", authMiddleware, async (req: any, res) => {
     try {
 
-        const result = await client.query(
+        const result = await pool.query(
             `
             SELECT
                 id,

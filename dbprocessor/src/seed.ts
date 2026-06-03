@@ -75,7 +75,9 @@ async function initializeDB() {
       asset VARCHAR(20) NOT NULL,
       available NUMERIC(30,10) DEFAULT 0,
       locked NUMERIC(30,10) DEFAULT 0,
+
       UNIQUE(user_id, asset),
+
       CONSTRAINT fk_user
         FOREIGN KEY(user_id)
         REFERENCES users(id)
@@ -83,7 +85,7 @@ async function initializeDB() {
     );
   `);
 
-  // Market ticks
+  // Market ticks table
   await client.query(`
     CREATE TABLE IF NOT EXISTS market_ticks (
       id BIGSERIAL PRIMARY KEY,
@@ -94,7 +96,7 @@ async function initializeDB() {
     );
   `);
 
-  // Drop old K-line materialized views
+  // Drop old materialized views
   await client.query(`
     DROP MATERIALIZED VIEW IF EXISTS klines_1m;
   `);
@@ -107,7 +109,7 @@ async function initializeDB() {
     DROP MATERIALIZED VIEW IF EXISTS klines_1h;
   `);
 
-  // Drop old regular views too, so recreate is clean
+  // Drop old regular views
   await client.query(`
     DROP VIEW IF EXISTS klines_1m;
   `);
@@ -120,7 +122,7 @@ async function initializeDB() {
     DROP VIEW IF EXISTS klines_1h;
   `);
 
-  // 1m klines as regular view
+  // 1 minute klines
   await client.query(`
     CREATE VIEW klines_1m AS
     SELECT
@@ -132,10 +134,12 @@ async function initializeDB() {
       sum(volume) AS volume,
       market
     FROM market_ticks
-    GROUP BY time_bucket('1 minute', created_at), market;
+    GROUP BY
+      time_bucket('1 minute', created_at),
+      market;
   `);
 
-  // 5m klines as regular view
+  // 5 minute klines
   await client.query(`
     CREATE VIEW klines_5m AS
     SELECT
@@ -147,10 +151,12 @@ async function initializeDB() {
       sum(volume) AS volume,
       market
     FROM market_ticks
-    GROUP BY time_bucket('5 minutes', created_at), market;
+    GROUP BY
+      time_bucket('5 minutes', created_at),
+      market;
   `);
 
-  // 1h klines as regular view
+  // 1 hour klines
   await client.query(`
     CREATE VIEW klines_1h AS
     SELECT
@@ -162,7 +168,9 @@ async function initializeDB() {
       sum(volume) AS volume,
       market
     FROM market_ticks
-    GROUP BY time_bucket('1 hour', created_at), market;
+    GROUP BY
+      time_bucket('1 hour', created_at),
+      market;
   `);
 
   // Indexes
@@ -200,6 +208,8 @@ async function initializeDB() {
 
 initializeDB().catch(async (err) => {
   console.error("DB init failed:", err);
+
   await client.end();
+
   process.exit(1);
 });

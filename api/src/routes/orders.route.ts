@@ -15,11 +15,37 @@ ordersRouter.post("/", authMiddleware, async (req: any, res) => {
   try {
     const { market, side, kind, price, quantity } = req.body;
 
-    if (!market || !side || !kind || !quantity) {
+      if (
+      !market ||
+      !side ||
+      !kind ||
+      quantity == null
+    ) {
       return res.status(400).json({
         error: "Missing required fields",
       });
     }
+
+    if (Number(quantity) <= 0) {
+      return res.status(400).json({
+        error: "Invalid quantity",
+      });
+    }
+
+    if (kind === "LIMIT") {
+      if (price == null) {
+        return res.status(400).json({
+          error: "Price required for limit order",
+        });
+      }
+
+      if (Number(price) <= 0) {
+        return res.status(400).json({
+          error: "Invalid price",
+        });
+      }
+    }
+
 
     const response: any = await redis.sendAndawait({
       type: CREATE_ORDER,
@@ -27,7 +53,7 @@ ordersRouter.post("/", authMiddleware, async (req: any, res) => {
         market,
         side,
         kind,
-        price: price ?? null,
+        price: price,
         quantity,
         userId: req.userId,
         timestamp: Date.now(),
@@ -48,6 +74,7 @@ ordersRouter.post("/", authMiddleware, async (req: any, res) => {
 
 ordersRouter.get("/open", authMiddleware, async (req: any, res) => {
   try {
+    // @note: Should be direct query from db dont follow this (unnecessary to send in engineworker)
     const response: any = await redis.sendAndawait({
       type: GET_OPEN_ORDERS,
       data: {

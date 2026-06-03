@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { client } from "../db";
+import { pool } from "../db";
 
 export const klinesRouter = Router();
 
@@ -23,7 +23,7 @@ klinesRouter.get("/", async (req, res) => {
 
         const tableName = `klines_${interval}`;
 
-        const result = await client.query(
+        const result = await pool.query(
             `
             SELECT
                 bucket,

@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { authMiddleware } from "../middleware/middleware";
-import { client } from "../db";
+import { pool } from "../db";
 
 export const balancesrouter = Router();
 
 balancesrouter.get("/", authMiddleware, async (req: any, res) => {
   try {
 
-    const result = await client.query(
+    const result = await pool.query(
       `
       SELECT
         asset,
